@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:habits/db/habit_dataBase.dart';
 import 'package:habits/pages/home_page.dart';
 import 'package:habits/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  //initialize db
+  await HabitDataBase.initialize();
+  await HabitDataBase.saveFirstLaunchDate();
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => HabitDataBase()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+      ],
       child: const MyApp(),
     ),
   );

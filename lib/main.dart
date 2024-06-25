@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:habits/db/habit_database.dart';
 import 'package:habits/pages/home_page.dart';
@@ -16,7 +17,10 @@ void main() async {
         ChangeNotifierProvider(create: (context) => HabitDataBase()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
-      child: const MyApp(),
+      child: DevicePreview(
+        enabled: true,
+        builder: (context) => const MyApp(),
+      ),
     ),
   );
 }
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
       builder: (context, themeProvider, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: HomePage(),
+          home: const HomePage(),
           theme: themeProvider.themeData,
         );
       },

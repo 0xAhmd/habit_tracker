@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:habits/components/my_drawer.dart';
+import 'package:habits/components/my_habit_tile.dart';
 import 'package:habits/db/habit_database.dart';
 import 'package:habits/models/habit.dart';
 import 'package:habits/utilities/habit_utilit.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -61,12 +62,57 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void checkHabitOnOff(bool? value, Habit habit) {
+    if (value != null) {
+      Provider.of<HabitDataBase>(context, listen: false)
+          .updatedHabitCompletion(habit.id, value);
+    }
+  }
+
+  void editHabitBox(Habit habit) {
+    textController.text = habit.name;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: TextField(
+          controller: textController,
+        ),
+        actions: [
+          //save
+
+          MaterialButton(
+            onPressed: () {
+              String newHabit = textController.text;
+              Provider.of<HabitDataBase>(context, listen: false)
+                  .updateHabitName(habit.id, newHabit);
+              Navigator.pop(context);
+              textController.clear();
+            },
+            child: const Text("Save"),
+          ),
+
+          // cancel button
+          MaterialButton(
+            onPressed: () {
+              Navigator.pop(context);
+              textController.clear();
+            },
+            child: const Text("Cancel"),
+          ),
+
+          //cancle
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.tertiary,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       drawer: const MyDrawer(),
       floatingActionButton: FloatingActionButton(
@@ -82,9 +128,41 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void deleteHabitBox(Habit habit) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("you sure you want to Delete this Habit?"),
+        actions: [
+          //save
+
+          MaterialButton(
+            onPressed: () {
+              Provider.of<HabitDataBase>(context, listen: false).deleteHabit(
+                habit.id,
+              );
+              Navigator.pop(context);
+            },
+            child: const Text("Delete"),
+          ),
+
+          // cancel button
+          MaterialButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Cancel"),
+          ),
+
+          //cancle
+        ],
+      ),
+    );
+  }
+
   Widget _buildHabitList() {
     // habit db
-    final habitDataBase = context.watch<HabitDataBase>();
+    final habitDataBase = Provider.of<HabitDataBase>(context);
     // current habit
     List<Habit> currentHabits = habitDataBase.currentHabits;
     // return list
@@ -92,13 +170,15 @@ class _HomePageState extends State<HomePage> {
       itemCount: currentHabits.length,
       itemBuilder: (context, index) {
         // get each habit
-
         final habit = currentHabits[index];
         //check if completed today
-
         bool isCompletedToday = isHabitCompletedToday(habit.completedDays);
-        return ListTile(
-          title: Text(habit.name),
+        return MyHabitTile(
+          isCompleted: isCompletedToday,
+          text: habit.name,
+          onChanged: (value) => checkHabitOnOff(value, habit),
+          editHabit: (conetxt) => editHabitBox(habit),
+          deleteHabit: (context) => deleteHabitBox(habit),
         );
         //return title
       },

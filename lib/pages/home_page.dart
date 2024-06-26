@@ -1,6 +1,11 @@
+import 'dart:nativewrappers/_internal/vm/lib/mirrors_patch.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:habits/components/my_drawer.dart';
 import 'package:habits/components/my_habit_tile.dart';
+import 'package:habits/components/my_heatmap.dart';
 import 'package:habits/db/habit_database.dart';
 import 'package:habits/models/habit.dart';
 import 'package:habits/utilities/habit_utilit.dart';
@@ -118,13 +123,18 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => createNewHabit(context),
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.tertiary,
+        backgroundColor: Colors.blueAccent,
         child: const Icon(
           Icons.add,
           color: Colors.white,
         ),
       ),
-      body: _buildHabitList(),
+      body: ListView(
+        children: [
+          _buildHeatMap(),
+          _buildHabitList(),
+        ],
+      ),
     );
   }
 
@@ -160,6 +170,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildHeatMap() {
+    final habitDataBase = context.watch<HabitDataBase>();
+    List<Habit> currentHabits = habitDataBase.currentHabits;
+
+    return FutureBuilder<DateTime?>(
+        future: habitDataBase.getFirstLaunchDate(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return MyHeatmap(
+              startDate: snapshot.data!,
+              datasets: prepareHabitMapDataset(currentHabits),
+            );
+          } else {
+            return Container();
+          }
+        });
+  }
+
   Widget _buildHabitList() {
     // habit db
     final habitDataBase = Provider.of<HabitDataBase>(context);
@@ -168,6 +196,8 @@ class _HomePageState extends State<HomePage> {
     // return list
     return ListView.builder(
       itemCount: currentHabits.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         // get each habit
         final habit = currentHabits[index];

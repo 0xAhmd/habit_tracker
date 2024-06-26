@@ -17,10 +17,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => HabitDataBase()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ],
-      child: DevicePreview(
-        enabled: true,
-        builder: (context) => const MyApp(),
-      ),
+      child: const MyApp(),
     ),
   );
 }

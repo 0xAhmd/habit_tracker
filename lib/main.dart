@@ -1,4 +1,3 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:habits/db/habit_database.dart';
 import 'package:habits/pages/home_page.dart';

@@ -1,8 +1,5 @@
-import 'dart:nativewrappers/_internal/vm/lib/mirrors_patch.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:habits/components/my_drawer.dart';
 import 'package:habits/components/my_habit_tile.dart';
 import 'package:habits/components/my_heatmap.dart';
@@ -15,6 +12,7 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
